@@ -45,7 +45,7 @@ CREATE TABLE items (
   rating INT CHECK (rating BETWEEN 0 AND 5),
   reputation int CHECK (reputation BETWEEN 0 AND 1000),
   price INT NOT NULL,
-  availability_size int,
+  availability_size int NOT NULL,
   category_id int,
   location_id int,
   reputationBadge_id int,
