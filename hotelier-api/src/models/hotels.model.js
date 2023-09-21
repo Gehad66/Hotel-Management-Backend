@@ -57,7 +57,7 @@ const hotel_location = dbSequalize.define('hotel_location', {
         primaryKey: true,
         autoIncrement: true
     },
-    zipcode: {
+    zip_code: {
         type: Sequelize.INTEGER,
         allowNull: false
     },
@@ -97,6 +97,10 @@ const items = dbSequalize.define('items', {
     },
     rating: {
         type: Sequelize.INTEGER,
+        allowNull: true,
+    }, 
+    image_url: {
+        type: Sequelize.STRING,
         allowNull: true,
     },
     reputation: {
@@ -171,6 +175,32 @@ const image = dbSequalize.define('image', {
         }
     }
 });
+
+hotel_location.hasMany(items, {
+    foreignKey: "id"
+  });
+items.belongsTo(hotel_location, {as: 'location',
+    foreignKey: "location_id"
+  });
+category.hasMany(items, {
+    foreignKey: "id"
+  })
+items.belongsTo(category, {
+foreignKey: "category_id"
+});
+reputationBadge.hasMany(items, {
+    foreignKey: "id"
+  })
+items.belongsTo(reputationBadge, {
+foreignKey: "reputationBadge_id"
+});
+hotelier.hasMany(items, {
+    foreignKey: "id"
+  })
+items.belongsTo(hotelier, {
+foreignKey: "hotelier_id"
+});
+
 // dbSequalize.sync();
 
 module.exports = {
@@ -179,5 +209,6 @@ module.exports = {
     reputationBadge,
     hotel_location,
     items,
-    image
+    image,
+    Sequelize
 };

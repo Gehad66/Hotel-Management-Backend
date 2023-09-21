@@ -22,7 +22,7 @@ CREATE INDEX reputationBadge_index ON reputationBadge(reputationBadge);
 
 CREATE TABLE hotel_location (
   location_id INT NOT NULL AUTO_INCREMENT,
-  zipcode INT NOT NULL,
+  zip_code INT NOT NULL,
   country VARCHAR(255) NOT NULL,
   state_name VARCHAR(255) NOT NULL,
   city VARCHAR(255) NOT NULL,
@@ -41,6 +41,7 @@ CREATE TABLE items (
   location_id int,
   reputationBadge_id int,
   hotelier_id int,
+  image_url VARCHAR(255),
   PRIMARY KEY (id),
   FOREIGN KEY (category_id) REFERENCES category(category_id),
   FOREIGN KEY (location_id) REFERENCES hotel_location(location_id),
@@ -48,7 +49,6 @@ CREATE TABLE items (
   FOREIGN KEY (hotelier_id) REFERENCES hotelier(hotelier_id)
 );
 CREATE INDEX item_index ON items(item_name, rating);
-
 CREATE TABLE image (
   image_id INT NOT NULL AUTO_INCREMENT,
   image_url VARCHAR(255) NOT NULL,
@@ -68,7 +68,7 @@ Insert into reputationBadge(reputationBadge) values('red');
 Insert into reputationBadge(reputationBadge) values('yellow');
 Insert into reputationBadge(reputationBadge) values('green');
 insert into hotelier (hotelier_name) Values ('helnan');
-insert into hotel_location (zipcode,country,state_name,city,location_address) Values (12345,'Egypt','Cairo','Cairo','address xx');
+insert into hotel_location (zip_code,country,state_name,city,location_address) Values (12345,'Egypt','Cairo','Cairo','address xx');
 insert into items (
 item_name,
 rating,
