@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const dbSequalize = require('./sequelize');
 
 // export
- const hotelier = dbSequalize.define('hotelier', {
+const hotelier = dbSequalize.define('hotelier', {
     hotelier_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -12,6 +12,12 @@ const dbSequalize = require('./sequelize');
         type: Sequelize.STRING,
         allowNull: false,
     }
+},
+ {
+    indexes: [{
+        unique: false,
+        fields: ['hotelier_name']
+    }]
 });
 // export 
 const category = dbSequalize.define('category', {
@@ -27,7 +33,7 @@ const category = dbSequalize.define('category', {
 });
 
 // export
- const reputationBadge = dbSequalize.define('reputationBadge', {
+const reputationBadge = dbSequalize.define('reputationBadge', {
     reputationBadge_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -37,6 +43,12 @@ const category = dbSequalize.define('category', {
         type: Sequelize.STRING,
         allowNull: false,
     }
+},
+{
+   indexes: [{
+       unique: false,
+       fields: ['reputationBadge']
+   }]
 });
 // export 
 const hotel_location = dbSequalize.define('hotel_location', {
@@ -65,9 +77,15 @@ const hotel_location = dbSequalize.define('hotel_location', {
         type: Sequelize.STRING,
         allowNull: false
     }
+},
+{
+  indexes: [{
+       unique: false,
+       fields: ['city', 'country']
+   }]
 });
 // export
- const items = dbSequalize.define('items', {
+const items = dbSequalize.define('items', {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -125,10 +143,16 @@ const hotel_location = dbSequalize.define('hotel_location', {
             key: 'hotelier_id',
         }
     }
+},
+{
+  indexes: [{
+       unique: false,
+       fields: ['item_name', 'rating']
+   }]
 });
 
 // export
- const image = dbSequalize.define('image', {
+const image = dbSequalize.define('image', {
     image: {
         type: Sequelize.INTEGER,
         primaryKey: true,
