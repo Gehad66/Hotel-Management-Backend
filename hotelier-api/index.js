@@ -4,8 +4,7 @@ const express = require("express");
 const HotelRouter = require('./src/routes/hotel.routes');
 
 const app = express();
-
-
+app.use(express.json())
 
 app.get("/", (req, res) => {
     res.send("About hoteliers p");
