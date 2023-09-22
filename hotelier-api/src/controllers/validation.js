@@ -15,10 +15,6 @@ const validateItemName = (name) => {
             throw Error("Error in name, please remove any of free, offer, book, website");
         }
     }
-
-    // if (restrictedJargon.includes(name)) {
-    //     throw Error("Error in name, please remove any of free, offer, book, website");
-    // }
 }
 const validateItemCategory = (category) => {
     const validCategories = ['hotel', 'alternative', 'hostel', 'lodge', 'resort', 'guest-house'];
@@ -44,6 +40,24 @@ const validateImageURL = (url) => {
         throw Error("Error: invalid image url");
     }
 }
+
+function isInteger(param) {
+    try {
+        return Number.isInteger(+param);
+    } catch (e) {
+        return false;
+    }
+}
+
+function validateInteger(id) {
+    if (!isInteger(id)) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Error: Invalid id type, expecting int'
+        });
+    }
+}
+
 const validateItemCreation = (item) => {
     validateItemName(item.name);
     validateRating(item.rating);
@@ -51,8 +65,20 @@ const validateItemCreation = (item) => {
     validateItemCategory(item.category);
     validateZipCodeLength(item.location.zip_code);
     if (item.image)
-        validateImageURL(item.image)
+        validateImageURL(item.image);
+}
+const validateItemUpdate = (item) => {
+    if (item.name) validateItemName(item.name);
+    if (item.rating) validateRating(item.rating);
+    if (item.reputation) validateReputationRange(item.reputation);
+    if (item.category) validateItemCategory(item.category);
+    if (item.location.zip_code) validateZipCodeLength(item.location.zip_code);
+    if (item.image) validateImageURL(item.image);
+}
 
+module.exports = {
+    validateItemCreation,
+    validateItemUpdate,
+    validateInteger,
+    validateZipCodeLength
 };
-module.exports =
-    validateItemCreation;
