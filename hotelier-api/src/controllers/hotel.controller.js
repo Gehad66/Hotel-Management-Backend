@@ -61,39 +61,6 @@ class HotelController {
         }
 
     }
-    static async getHotelierItems(req, res) {
-        try {
-            const hoterlier_name = req.params.hotelier_id;
-            var items;
-            if (Number.isInteger(+hoterlier_name)) {
-                items = await hotel.items.findAll({
-                    where: {
-                        hotelier_id: +hoterlier_name
-                    },
-                    include: [{
-                        model: hotel.hotel_location,
-                        as: 'location',
-                        attributes: ['city', ['state_name', 'state'], 'country', 'zip_code', ['location_address', 'address']],
-                        required: true
-                    }]
-                });
-            } else {
-                items = await hotel.items.findAll({
-                    where: {
-                        hotelier_name: hoterlier_name
-                    }
-                });
-            }
-            return res.status(200).json({
-                items
-            });
-        } catch (e) {
-            return res.status(500).json({
-                status: 500,
-                message: e.message
-            });
-        }
-    }
 
     async getHotelierID(hotierName) {
         id = hotel.hotelier.findAll({
@@ -124,7 +91,6 @@ class HotelController {
             validator.validateInteger(item_id);
 
             const items = await hotel.items.findAll({
-                // raw: true,
                 attributes: [
                     ['item_name', 'name'],
                     'rating',
@@ -161,6 +127,10 @@ class HotelController {
             var formated_item = helperFunctions.formatItemsResponse({
                 items
             });
+            if(formated_item.items.length ==1)
+                return res.status(200).json(
+                    formated_item.items[0]
+                );
             return res.status(200).json(
                 formated_item
             );
@@ -172,6 +142,59 @@ class HotelController {
         }
     }
 
+    static async getHotelierItems(req, res) {
+        try {
+            const hotelier_id= req.params.hotelier_id;
+
+            validator.validateInteger(hotelier_id);
+            // validator.validateInteger(item_id);
+
+            const items = await hotel.items.findAll({
+                attributes: [
+                    ['item_name', 'name'],
+                    'rating',
+                    ['image_url', 'image'],
+                    'reputation',
+                    'price',
+                    ['availability_size', 'availability'],
+                    'reputationBadge_id'
+                ],
+                where: {
+                    hotelier_id: +hotelier_id
+                },
+                include: [{
+                        model: hotel.hotel_location,
+                        as: 'location',
+                        attributes: ['city', ['state_name', 'state'], 'country', 'zip_code', ['location_address', 'address']],
+                        required: true
+                    },
+                    {
+                        model: hotel.category,
+                        attributes: [
+                            [hotel.Sequelize.col('category_type'), 'category']
+                        ]
+                    },
+                    {
+                        model: hotel.reputationBadge,
+                        attributes: [
+                            [hotel.Sequelize.col('reputationBadge'), 'reputationBadge']
+                        ]
+                    }
+                ]
+            });
+            var formated_item = helperFunctions.formatItemsResponse({
+                items
+            });
+            return res.status(200).json(
+                formated_item
+            );
+        } catch (e) {
+            return res.status(500).json({
+                status: 500,
+                message: e.message
+            });
+        }
+    }
     static async createHotelierItems(req, res) {
         try {
             const item = req.body;
