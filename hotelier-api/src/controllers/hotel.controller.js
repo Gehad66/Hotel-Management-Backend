@@ -1,16 +1,7 @@
 // var hotelService = require('../services/hotel.service')
 var hotel = require("../models/hotels.model");
 var validator = require("./validation");
-
-const calculateReputationBadge = (reputation) => {
-    if (reputation <= 500) {
-        return 'red';
-    } else if (500 < reputation && reputation <= 799) {
-        return 'yellow';
-    } else {
-        return 'green';
-    }
-}
+var helperFunctions = require("./helper");
 
 class HotelController {
     static async getAllHoteliers(req, res) {
@@ -21,8 +12,8 @@ class HotelController {
                 hotels
             });
         } catch (e) {
-            return res.status(400).json({
-                status: 400,
+            return res.status(500).json({
+                status: 500,
                 message: e.message
             });
         }
@@ -30,7 +21,7 @@ class HotelController {
     //   get hoterlier_name by name or id usign query parms
     static async getHotelier(req, res) {
         try {
-            var hoterlier_name = req.params.hoterlier_id;
+            const hoterlier_name = req.params.hotelier_id;
             var hotelier;
             if (Number.isInteger(+hoterlier_name)) {
                 hotelier = await hotel.hotelier.findAll({
@@ -49,22 +40,22 @@ class HotelController {
                 hotelier
             });
         } catch (e) {
-            return res.status(400).json({
-                status: 400,
+            return res.status(500).json({
+                status: 500,
                 message: e.message
             });
         }
     }
     static async addHotelier(req, res) {
         try {
-            var hotelier_name = req.body;
-            var new_hotelier = await hotel.hotelier.create(hotelier_name);
+            const hotelier_name = req.body;
+            const new_hotelier = await hotel.hotelier.create(hotelier_name);
             return res.status(200).json({
                 new_hotelier
             });
         } catch (e) {
-            return res.status(400).json({
-                status: 400,
+            return res.status(500).json({
+                status: 500,
                 message: e.message
             });
         }
@@ -72,7 +63,7 @@ class HotelController {
     }
     static async getHotelierItems(req, res) {
         try {
-            var hoterlier_name = req.params.hoterlier_id;
+            const hoterlier_name = req.params.hotelier_id;
             var items;
             if (Number.isInteger(+hoterlier_name)) {
                 items = await hotel.items.findAll({
@@ -97,8 +88,8 @@ class HotelController {
                 items
             });
         } catch (e) {
-            return res.status(400).json({
-                status: 400,
+            return res.status(500).json({
+                status: 500,
                 message: e.message
             });
         }
@@ -124,25 +115,27 @@ class HotelController {
 
     static async getHotelierSingleItem(req, res) {
         try {
-            var hoterlier_id = req.params.hoterlier_id;
-            var item_id = req.params.item_id;
-            if (!Number.isInteger(+hoterlier_id) || !Number.isInteger(+item_id)) {
-                return res.status(400).json({
-                    status: 400,
-                    message: 'invalid id type, expecting int'
-                });
+            const {
+                hotelier_id,
+                item_id
+            } = req.params;
 
-            }
-            var items = await hotel.items.findAll({
+            validator.validateInteger(hotelier_id);
+            validator.validateInteger(item_id);
+
+            const items = await hotel.items.findAll({
                 // raw: true,
                 attributes: [
-                    ['item_name', 'name'], 'rating', ['image_url', 'image'], 'reputation', 'price',
+                    ['item_name', 'name'],
+                    'rating',
+                    ['image_url', 'image'],
+                    'reputation',
+                    'price',
                     ['availability_size', 'availability'],
-                    // [hotel.Sequelize.col('category.category_type') , 'category'], 
-                    'reputationBadge.reputationBadge'
+                    'reputationBadge_id'
                 ],
                 where: {
-                    hotelier_id: +hoterlier_id,
+                    hotelier_id: +hotelier_id,
                     id: +item_id
                 },
                 include: [{
@@ -159,16 +152,21 @@ class HotelController {
                     },
                     {
                         model: hotel.reputationBadge,
-                        attributes: []
-                    },
+                        attributes: [
+                            [hotel.Sequelize.col('reputationBadge'), 'reputationBadge']
+                        ]
+                    }
                 ]
             });
-            return res.status(200).json({
+            var formated_item = helperFunctions.formatItemsResponse({
                 items
             });
+            return res.status(200).json(
+                formated_item
+            );
         } catch (e) {
-            return res.status(400).json({
-                status: 400,
+            return res.status(500).json({
+                status: 500,
                 message: e.message
             });
         }
@@ -176,22 +174,24 @@ class HotelController {
 
     static async createHotelierItems(req, res) {
         try {
-            var item = req.body;
-            validator(item);
-            var category_id = await hotel.category.findOne({where: {
-                category_type: item.category
-            }});
+            const item = req.body;
+            validator.validateItemCreation(item);
+            var category_id = await hotel.category.findOne({
+                where: {
+                    category_type: item.category
+                }
+            });
             category_id = category_id.category_id;
-            var new_location = await hotel.hotel_location.create({
+            const new_location = await hotel.hotel_location.create({
                 city: item.location.city,
                 state_name: item.location.state,
                 country: item.location.country,
                 zip_code: item.location.zip_code,
                 location_address: item.location.address
             });
-            var new_item = await hotel.items.create({
+            const new_item = await hotel.items.create({
                 item_name: item.name,
-                hotelier_id: req.params.hoterlier_id,
+                hotelier_id: req.params.hotelier_id,
                 rating: item.rating,
                 image_url: item.image,
                 reputation: item.reputation,
@@ -199,14 +199,84 @@ class HotelController {
                 availability_size: item.availability,
                 category_id: category_id,
                 location_id: new_location.id,
-                reputationBadge: calculateReputationBadge(item.reputation)
+                reputationBadge: helperFunctions.calculateReputationBadge(item.reputation)
             });
             return res.status(200).json({
                 new_item
             });
         } catch (e) {
-            return res.status(400).json({
-                status: 400,
+            return res.status(500).json({
+                status: 500,
+                message: e.message
+            });
+        }
+
+    }
+
+    static async updateHotelierItems(req, res) {
+        try {
+            const {
+                hotelier_id,
+                item_id
+            } = req.params;
+            validator.validateInteger(hotelier_id);
+            validator.validateInteger(item_id);
+            const body = req.body;
+            const isItemExist = await hotel.items.findOne({
+                where: {
+                    id: item_id,
+                    hotelier_id: hotelier_id
+                }
+            });
+            if (!isItemExist) {
+                return res.status(404).json({
+                    message: 'Error: No such item'
+                });
+            }
+            var updateReq = helperFunctions.createUpdateRequestBody(body);
+            if (body.reputation) {
+                const badge = updateReq.reputationBadge_id;
+                const reputationQuery = await hotel.reputationBadge.findOne({
+                    where: {
+                        reputationBadge: badge
+                    }
+                });
+                updateReq.reputationBadge_id = reputationQuery.reputationBadge_id;
+            }
+            if(updateReq.category_id){
+                const category = updateReq.category_id;
+                const categoryQuery = await hotel.category.findOne({
+                    where: {
+                        category_type: category
+                    }
+                });
+                updateReq.category_id = categoryQuery.category_id;
+            }
+            const updateItem = await hotel.items.update(
+                updateReq, {
+                    where: {
+                        id: item_id,
+                        hotelier_id: hotelier_id
+                    }
+                }
+            );
+            if (body.location) {
+                var location = helperFunctions.updateLocationRequestBody(body.location);
+                const updateLocation = await hotel.hotel_location.update(
+                    location, {
+                        where: {
+                            location_id: isItemExist.location_id
+                        }
+                    }
+                );
+            }
+            return res.status(200).json({
+                status: 200,
+                message: 'Update Success'
+            });
+        } catch (e) {
+            return res.status(500).json({
+                status: 500,
                 message: e.message
             });
         }
@@ -214,21 +284,33 @@ class HotelController {
     }
     static async deleteHotelierItems(req, res) {
         try {
-            var itemId = req.params.item_id;
-            var hotelierId = req.params.hoterlier_id;
-            var isItemExist = await hotel.items.findOne({where: {
-                id: itemId,
-                hotelier_id: hotelierId
-            }});
-            if (isItemExist) {
-                await isItemExist.destroy({ force: true });
-              }
-            return res.status(200).json({
-                isItemExist
+            const {
+                hotelier_id,
+                item_id
+            } = req.params;
+            validator.validateInteger(hotelier_id);
+            validator.validateInteger(item_id);
+            const isItemExist = await hotel.items.findOne({
+                where: {
+                    id: item_id,
+                    hotelier_id: hotelier_id
+                }
             });
+            if (isItemExist) {
+                await isItemExist.destroy({
+                    force: true
+                });
+                return res.status(200).json({
+                    isItemExist
+                });
+            } else {
+                return res.status(404).json({
+                    message: 'Error: No such item'
+                });
+            }
         } catch (e) {
-            return res.status(400).json({
-                status: 400,
+            return res.status(500).json({
+                status: 500,
                 message: e.message
             });
         }
