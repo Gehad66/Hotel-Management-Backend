@@ -7,7 +7,7 @@ const validator = require("./validate");
 const HOTELAPIURL = 'http://127.0.0.1:4000';
 const HOTELIER = '/hoteliers/';
 const ITEMS = '/items/';
-async function getAvailability(hotelier_id, item_id) {
+async function getSingleItemQuery(hotelier_id, item_id) {
     const url = HOTELAPIURL + HOTELIER + hotelier_id + ITEMS + item_id;
     const response = await unirest.get(url);
     if (response.error) {
@@ -18,6 +18,58 @@ async function getAvailability(hotelier_id, item_id) {
 }
 
 class BookingController {
+    static async availabilityItemUpdate(req, res) {
+        try {
+            // TODO validation
+            const body = req.body;
+            const availability = await bookingModel.items_availability.findOne({
+                attributes: ['max_availability', 'id'],
+                where: {
+                    item_id: body.item_id,
+                    hotelier_id: body.hotelier_id
+                }
+            });
+            if (!availability) {
+                return res.status(404).json({
+                    message: 'Error: No such item'
+                });
+            }
+            const new_item = await bookingModel.items_availability.update({
+                max_availability: body.max_availability
+            }, {
+                where: {
+                    id: availability.id
+                }
+            });
+            return res.status(200).json({
+                message: 'Success: availabilty updated'
+            });
+        } catch (e) {
+            return res.status(500).json({
+                status: 500,
+                message: e.message
+            });
+        }
+    }
+    static async availabilityItem(req, res) {
+        try {
+            // TODO validation
+            const body = req.body;
+            const new_item = await bookingModel.items_availability.create({
+                item_id: body.item_id,
+                hotelier_id: body.hotelier_id,
+                max_availability: body.max_availability,
+            });
+            return res.status(200).json({
+                message: 'Success: availabilty created'
+            });
+        } catch (e) {
+            return res.status(500).json({
+                status: 500,
+                message: e.message
+            });
+        }
+    }
     static async bookItem(req, res) {
         try {
             const {
@@ -41,7 +93,8 @@ class BookingController {
                             end_date: {
                                 [Sequelize.Op.between]: [start_date, end_date]
                             }
-                        }]
+                        }
+                    ]
                 }
             });
             const availability = await bookingModel.items_availability.findOne({
