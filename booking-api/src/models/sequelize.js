@@ -5,8 +5,9 @@ const Sequelize  = require('sequelize');
   'username': config.username,
   'password': config.password,
   'database': config.database,
-  'db_host': config.db_host,
+  'host': config.db_host,
   'dialect': config.dialect,
+  dialectModule: require('mysql2'),
   define: {
     timestamps: false,
     freezeTableName: true
