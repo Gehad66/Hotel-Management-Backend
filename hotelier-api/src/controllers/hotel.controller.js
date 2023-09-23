@@ -1,4 +1,3 @@
-// var hotelService = require('../services/hotel.service')
 var hotel = require("../models/hotels.model");
 var validator = require("./validation");
 var helperFunctions = require("./helper");
@@ -6,7 +5,6 @@ var helperFunctions = require("./helper");
 class HotelController {
     static async getAllHoteliers(req, res) {
         try {
-            // var hotels = await hotelService.getHotels({});
             var hotels = await hotel.hotelier.findAll();
             return res.status(200).json({
                 hotels
@@ -89,45 +87,11 @@ class HotelController {
 
             validator.validateInteger(hotelier_id);
             validator.validateInteger(item_id);
-
-            const items = await hotel.items.findAll({
-                attributes: [
-                    ['item_name', 'name'],
-                    'rating',
-                    ['image_url', 'image'],
-                    'reputation',
-                    'price',
-                    ['availability_size', 'availability'],
-                    'reputationBadge_id'
-                ],
-                where: {
-                    hotelier_id: +hotelier_id,
-                    id: +item_id
-                },
-                include: [{
-                        model: hotel.hotel_location,
-                        as: 'location',
-                        attributes: ['city', ['state_name', 'state'], 'country', 'zip_code', ['location_address', 'address']],
-                        required: true
-                    },
-                    {
-                        model: hotel.category,
-                        attributes: [
-                            [hotel.Sequelize.col('category_type'), 'category']
-                        ]
-                    },
-                    {
-                        model: hotel.reputationBadge,
-                        attributes: [
-                            [hotel.Sequelize.col('reputationBadge'), 'reputationBadge']
-                        ]
-                    }
-                ]
-            });
+            const items = await helperFunctions.getHotelierSingleItemQuery(hotelier_id, item_id);
             var formated_item = helperFunctions.formatItemsResponse({
                 items
             });
-            if(formated_item.items.length ==1)
+            if (formated_item.items.length == 1)
                 return res.status(200).json(
                     formated_item.items[0]
                 );
@@ -144,44 +108,9 @@ class HotelController {
 
     static async getHotelierItems(req, res) {
         try {
-            const hotelier_id= req.params.hotelier_id;
-
+            const hotelier_id = req.params.hotelier_id;
             validator.validateInteger(hotelier_id);
-            // validator.validateInteger(item_id);
-
-            const items = await hotel.items.findAll({
-                attributes: [
-                    ['item_name', 'name'],
-                    'rating',
-                    ['image_url', 'image'],
-                    'reputation',
-                    'price',
-                    ['availability_size', 'availability'],
-                    'reputationBadge_id'
-                ],
-                where: {
-                    hotelier_id: +hotelier_id
-                },
-                include: [{
-                        model: hotel.hotel_location,
-                        as: 'location',
-                        attributes: ['city', ['state_name', 'state'], 'country', 'zip_code', ['location_address', 'address']],
-                        required: true
-                    },
-                    {
-                        model: hotel.category,
-                        attributes: [
-                            [hotel.Sequelize.col('category_type'), 'category']
-                        ]
-                    },
-                    {
-                        model: hotel.reputationBadge,
-                        attributes: [
-                            [hotel.Sequelize.col('reputationBadge'), 'reputationBadge']
-                        ]
-                    }
-                ]
-            });
+            const items = await helperFunctions.getHotelierAllItemsQuery(hotelier_id);
             var formated_item = helperFunctions.formatItemsResponse({
                 items
             });
@@ -224,6 +153,8 @@ class HotelController {
                 location_id: new_location.id,
                 reputationBadge: helperFunctions.calculateReputationBadge(item.reputation)
             });
+            const bookingAvailability = await helperFunctions.createBookingAvailability(
+                new_item.id, req.params.hotelier_id, item.availability);
             return res.status(200).json({
                 new_item
             });
@@ -235,7 +166,6 @@ class HotelController {
         }
 
     }
-
     static async updateHotelierItems(req, res) {
         try {
             const {
@@ -245,12 +175,7 @@ class HotelController {
             validator.validateInteger(hotelier_id);
             validator.validateInteger(item_id);
             const body = req.body;
-            const isItemExist = await hotel.items.findOne({
-                where: {
-                    id: item_id,
-                    hotelier_id: hotelier_id
-                }
-            });
+            const isItemExist = await helperFunctions.itemExists(hotelier_id, item_id);
             if (!isItemExist) {
                 return res.status(404).json({
                     message: 'Error: No such item'
@@ -266,7 +191,7 @@ class HotelController {
                 });
                 updateReq.reputationBadge_id = reputationQuery.reputationBadge_id;
             }
-            if(updateReq.category_id){
+            if (updateReq.category_id) {
                 const category = updateReq.category_id;
                 const categoryQuery = await hotel.category.findOne({
                     where: {
@@ -274,6 +199,10 @@ class HotelController {
                     }
                 });
                 updateReq.category_id = categoryQuery.category_id;
+            }
+            if(updateReq.availability_size){
+                const bookingAvailability = await helperFunctions.updateBookingAvailability(
+                    item_id, hotelier_id, updateReq.availability_size);
             }
             const updateItem = await hotel.items.update(
                 updateReq, {
@@ -313,12 +242,7 @@ class HotelController {
             } = req.params;
             validator.validateInteger(hotelier_id);
             validator.validateInteger(item_id);
-            const isItemExist = await hotel.items.findOne({
-                where: {
-                    id: item_id,
-                    hotelier_id: hotelier_id
-                }
-            });
+            const isItemExist = await helperFunctions.itemExists(hotelier_id, item_id);
             if (isItemExist) {
                 await isItemExist.destroy({
                     force: true
