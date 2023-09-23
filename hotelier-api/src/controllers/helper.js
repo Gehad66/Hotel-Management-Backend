@@ -1,5 +1,39 @@
 var validator = require("./validation");
+var hotel = require("../models/hotels.model");
+var unirest = require('unirest');
 
+const BOOKING_SERVICE_URL = 'http://127.0.0.1:3000';
+const BOOKINGS = '/bookings/availability';
+async function createBookingAvailability(item_id, hotelier_id, availability) {
+    var obj = {};
+    obj['hotelier_id'] = hotelier_id;
+    obj['item_id'] = item_id;
+    obj['max_availability'] = availability;
+    const url = BOOKING_SERVICE_URL + BOOKINGS;
+    const response = await unirest.post(url).headers({
+        'Content-Type': 'application/json'
+      })
+      .send(obj);
+    if (response.error) {
+        throw response.error;
+    }
+    return response.body.availability;
+}
+async function updateBookingAvailability(item_id, hotelier_id, availability) {
+    var obj = {};
+    obj['hotelier_id'] = hotelier_id;
+    obj['item_id'] = item_id;
+    obj['max_availability'] = availability;
+    const url = BOOKING_SERVICE_URL + BOOKINGS;
+    const response = await unirest.put(url).headers({
+        'Content-Type': 'application/json'
+      })
+      .send(obj);
+    if (response.error) {
+        throw response.error;
+    }
+    return response.body.availability;
+}
 const calculateReputationBadge = (reputation) => {
     if (reputation <= 500) {
         return 'red';
@@ -56,9 +90,9 @@ const createUpdateRequestBody = (body) => {
     return jsonData;
 }
 const updateLocationRequestBody = (body) => {
-    validator.validateZipCodeLength(body.zip_code);
     var jsonData = {};
     if (body.zip_code) {
+        validator.validateZipCodeLength(body.zip_code);
         jsonData['zip_code'] = body.zip_code;
     }
     if (body.country) {
@@ -75,10 +109,95 @@ const updateLocationRequestBody = (body) => {
     }
     return jsonData;
 }
+async function itemExists(hotelier_id, item_id) {
+    return await hotel.items.findOne({
+        where: {
+            id: item_id,
+            hotelier_id: hotelier_id
+        }
+    });;
+}
+async function getHotelierAllItemsQuery(hotelier_id){
+    return await hotel.items.findAll({
+        attributes: [
+            ['item_name', 'name'],
+            'rating',
+            ['image_url', 'image'],
+            'reputation',
+            'price',
+            ['availability_size', 'availability'],
+            'reputationBadge_id'
+        ],
+        where: {
+            hotelier_id: +hotelier_id
+        },
+        include: [{
+                model: hotel.hotel_location,
+                as: 'location',
+                attributes: ['city', ['state_name', 'state'], 'country', 'zip_code', ['location_address', 'address']],
+                required: true
+            },
+            {
+                model: hotel.category,
+                attributes: [
+                    [hotel.Sequelize.col('category_type'), 'category']
+                ]
+            },
+            {
+                model: hotel.reputationBadge,
+                attributes: [
+                    [hotel.Sequelize.col('reputationBadge'), 'reputationBadge']
+                ]
+            }
+        ]
+    });
+}
+async function getHotelierSingleItemQuery(hotelier_id, item_id){
+    return await hotel.items.findAll({
+                attributes: [
+                    ['item_name', 'name'],
+                    'rating',
+                    ['image_url', 'image'],
+                    'reputation',
+                    'price',
+                    ['availability_size', 'availability'],
+                    'reputationBadge_id'
+                ],
+                where: {
+                    hotelier_id: +hotelier_id,
+                    id: +item_id
+                },
+                include: [{
+                        model: hotel.hotel_location,
+                        as: 'location',
+                        attributes: ['city', ['state_name', 'state'], 'country', 'zip_code', ['location_address', 'address']],
+                        required: true
+                    },
+                    {
+                        model: hotel.category,
+                        attributes: [
+                            [hotel.Sequelize.col('category_type'), 'category']
+                        ]
+                    },
+                    {
+                        model: hotel.reputationBadge,
+                        attributes: [
+                            [hotel.Sequelize.col('reputationBadge'), 'reputationBadge']
+                        ]
+                    }
+                ]
+            });
+            
+}
 
 module.exports = {
     calculateReputationBadge,
     formatItemsResponse,
     createUpdateRequestBody,
-    updateLocationRequestBody
+    updateLocationRequestBody,
+    getHotelierSingleItemQuery,
+    itemExists,
+    getHotelierAllItemsQuery,
+    createBookingAvailability,
+    updateBookingAvailability
 };

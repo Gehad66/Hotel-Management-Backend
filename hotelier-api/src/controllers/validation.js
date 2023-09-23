@@ -72,7 +72,7 @@ const validateItemUpdate = (item) => {
     if (item.rating) validateRating(item.rating);
     if (item.reputation) validateReputationRange(item.reputation);
     if (item.category) validateItemCategory(item.category);
-    if (item.location.zip_code) validateZipCodeLength(item.location.zip_code);
+    if (item.location && item.location.zip_code) validateZipCodeLength(item.location.zip_code);
     if (item.image) validateImageURL(item.image);
 }
 
