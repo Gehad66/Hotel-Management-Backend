@@ -6,6 +6,7 @@ const Sequelize  = require('sequelize');
   'password': config.password,
   'database': config.database,
   'host': config.db_host,
+  'port': config.port,
   'dialect': config.dialect,
   dialectModule: require('mysql2'),
   define: {
