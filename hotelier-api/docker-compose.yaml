@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  mysql_server:
+    container_name: mysql_server
+    build: ./docker/db
+    environment:
+      MYSQL_ROOT_PASSWORD: secretG6
+      MYSQL_DATABASE: hotels_db
+    ports:
+      - 3306:3306
+    restart: always
+  web:
+    depends_on:
+      - mysql_server
+    build: .
+    environment:
+      MYSQL_HOST: mysql_server
+    ports:
+      - "4000:4000"
+    restart: on-failure
