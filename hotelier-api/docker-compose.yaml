@@ -6,6 +6,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: secretG6
       MYSQL_DATABASE: hotels_db
+    networks:
+      - db-net
     ports:
       - 3306:3306
     restart: always
@@ -15,6 +17,10 @@ services:
     build: .
     environment:
       MYSQL_HOST: mysql_server
+    networks:
+      - db-net
     ports:
       - "4000:4000"
     restart: on-failure
+networks:
+  db-net:
