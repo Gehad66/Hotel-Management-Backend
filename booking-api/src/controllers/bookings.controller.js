@@ -1,22 +1,6 @@
 var bookingModel = require("../models/bookings.model");
 const Sequelize = require('sequelize');
-var unirest = require('unirest');
 const validator = require("./validate");
-
-// TODO
-const HOTELAPIURL = 'http://127.0.0.1:4000';
-const HOTELIER = '/hoteliers/';
-const ITEMS = '/items/';
-async function getSingleItemQuery(hotelier_id, item_id) {
-    const url = HOTELAPIURL + HOTELIER + hotelier_id + ITEMS + item_id;
-    const response = await unirest.get(url);
-    if (response.error) {
-        throw response.error;
-    }
-
-    return response.body.availability;
-}
-
 class BookingController {
     static async availabilityItemUpdate(req, res) {
         try {
