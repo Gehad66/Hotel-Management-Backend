@@ -1,0 +1,329 @@
+{
+	"info": {
+		"_postman_id": "58e0ffcb-cc82-4adc-a8aa-6d3c37c345f1",
+		"name": "Hotel Managment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29906184"
+	},
+	"item": [
+		{
+			"name": "bookings",
+			"item": [
+				{
+					"name": "booking",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"start_date\": \"2023-09-11\",\n    \"end_date\": \"2023-09-15\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{booking_url}}/bookings/hoteliers/1/items/2",
+							"host": [
+								"{{booking_url}}"
+							],
+							"path": [
+								"bookings",
+								"hoteliers",
+								"1",
+								"items",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "availability",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item_id\": 2,\n    \"hotelier_id\": 1,\n    \"max_availability\": 5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{booking_url}}/bookings/availability",
+							"host": [
+								"{{booking_url}}"
+							],
+							"path": [
+								"bookings",
+								"availability"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "availability update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item_id\": 1,\n    \"hotelier_id\": 1,\n    \"max_availability\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{booking_url}}/bookings/availability",
+							"host": [
+								"{{booking_url}}"
+							],
+							"path": [
+								"bookings",
+								"availability"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "connection test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{booking_url}}/",
+							"host": [
+								"{{booking_url}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "hotel items",
+			"item": [
+				{
+					"name": "get hoteliers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hotel_url}}/hoteliers",
+							"host": [
+								"{{hotel_url}}"
+							],
+							"path": [
+								"hoteliers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create hotelier",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"hotelier_name\": \"sonesta\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hotel_url}}/hoteliers",
+							"host": [
+								"{{hotel_url}}"
+							],
+							"path": [
+								"hoteliers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get hotelier",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hotel_url}}/hoteliers/2",
+							"host": [
+								"{{hotel_url}}"
+							],
+							"path": [
+								"hoteliers",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add item",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"JW Port Said3\",\n    \"rating\": 4,\n    \"image\": \"http://ee.com\",\n    \"reputation\": 900,\n    \"price\": 700,\n    \"availability\": 10,\n    \"category\": \"hotel\",\n    \"location\": {\n        \"city\": \"Port\",\n        \"state\": \"Cairo\",\n        \"country\": \"Egypt\",\n        \"zip_code\": 12345,\n        \"address\": \"address xx\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hotel_url}}/hoteliers/1/items",
+							"host": [
+								"{{hotel_url}}"
+							],
+							"path": [
+								"hoteliers",
+								"1",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hotel_url}}/hoteliers/1/items",
+							"host": [
+								"{{hotel_url}}"
+							],
+							"path": [
+								"hoteliers",
+								"1",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get item",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hotel_url}}/hoteliers/1/items/1",
+							"host": [
+								"{{hotel_url}}"
+							],
+							"path": [
+								"hoteliers",
+								"1",
+								"items",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete item",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{hotel_url}}/hoteliers/2/items/5",
+							"host": [
+								"{{hotel_url}}"
+							],
+							"path": [
+								"hoteliers",
+								"2",
+								"items",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update item",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n            \"availability\": 15\n        }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{hotel_url}}/hoteliers/1/items/1",
+							"host": [
+								"{{hotel_url}}"
+							],
+							"path": [
+								"hoteliers",
+								"1",
+								"items",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "booking_url",
+			"value": "http://127.0.0.1:3000"
+		},
+		{
+			"key": "hotel_url",
+			"value": "http://127.0.0.1:4000",
+			"type": "string"
+		}
+	]
+}
