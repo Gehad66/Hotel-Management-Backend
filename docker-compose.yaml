@@ -1,0 +1,50 @@
+version: "3.8"
+services:
+  book_mysql_server:
+    container_name: book_mysql_server
+    build: ./booking-api/docker/db
+    environment:
+      MYSQL_ROOT_PASSWORD: secretG6
+      MYSQL_DATABASE: bookings_db
+      MYSQL_TCP_PORT: 3307
+    networks:
+      - db-net
+    ports:
+      - 3307:3306
+    restart: always
+  book_web:
+    depends_on:
+      - book_mysql_server
+    build: ./booking-api
+    environment:
+      MYSQL_HOST_BOOK: book_mysql_server
+      BOOK_PORT: '3307'
+    networks:
+      - db-net
+    ports:
+      - "3000:3000"
+    restart: on-failure
+  mysql_server:
+    container_name: mysql_server
+    build: ./hotelier-api/docker/db
+    environment:
+      MYSQL_ROOT_PASSWORD: secretG6
+      MYSQL_DATABASE: hotels_db
+    networks:
+      - db-net
+    ports:
+      - 3306:3306
+    restart: always
+  web:
+    depends_on:
+      - mysql_server
+    build: ./hotelier-api
+    environment:
+      MYSQL_HOST: mysql_server
+    networks:
+      - db-net
+    ports:
+      - "4000:4000"
+    restart: on-failure
+networks:
+  db-net:

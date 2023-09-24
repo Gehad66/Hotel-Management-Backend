@@ -1,8 +1,9 @@
 var validator = require("./validation");
 var hotel = require("../models/hotels.model");
 var unirest = require('unirest');
+const config = require('../config/config');
 
-const BOOKING_SERVICE_URL = 'http://127.0.0.1:3000';
+const BOOKING_SERVICE_URL = 'http://'+config.booking_url+':3000';
 const BOOKINGS = '/bookings/availability';
 async function createBookingAvailability(item_id, hotelier_id, availability) {
     var obj = {};

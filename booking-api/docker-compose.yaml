@@ -19,6 +19,7 @@ services:
     environment:
       MYSQL_HOST_BOOK: book_mysql_server
       BOOK_PORT: '3307'
+      BOOK_URL: book_web
     networks:
       - db-net
     ports:
