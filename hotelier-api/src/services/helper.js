@@ -142,15 +142,13 @@ async function getHotelierAllItemsQuery(hotelier_id){
                 model: hotel.category,
                 attributes: [
                     [hotel.Sequelize.col('category_type'), 'category']
-                ],
-                required: true
+                ]
             },
             {
                 model: hotel.reputationBadge,
                 attributes: [
                     [hotel.Sequelize.col('reputationBadge'), 'reputationBadge']
-                ],
-                required: true
+                ]
             }
         ]
     });
