@@ -1,7 +1,6 @@
 
 const express = require("express");
 const errorHandling = require('./src/middlewares/errorHandling');
-// const HotelController = require('./src/controllers/hotel.controller');
 const HotelRouter = require('./src/routes/hotel.routes');
 
 const app = express();

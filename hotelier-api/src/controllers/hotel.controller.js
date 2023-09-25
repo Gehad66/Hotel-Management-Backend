@@ -1,7 +1,6 @@
 const hotelService = require("../services/hotel.service")
 class HotelController {
     static async getAllHoteliers(req, res) {
-        // throw new apiError('Something went wrong', 404); 
         return await hotelService.getAllHoteliers(req, res);
     }
 

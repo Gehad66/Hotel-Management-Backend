@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const dbSequalize = require('./sequelize');
 
-// export
+
 const hotelier = dbSequalize.define('hotelier', {
     hotelier_id: {
         type: Sequelize.INTEGER,
@@ -19,7 +19,7 @@ const hotelier = dbSequalize.define('hotelier', {
         fields: ['hotelier_name']
     }]
 });
-// export 
+ 
 const category = dbSequalize.define('category', {
     category_id: {
         type: Sequelize.INTEGER,
@@ -32,7 +32,7 @@ const category = dbSequalize.define('category', {
     }
 });
 
-// export
+
 const reputationBadge = dbSequalize.define('reputationBadge', {
     reputationBadge_id: {
         type: Sequelize.INTEGER,
@@ -50,7 +50,7 @@ const reputationBadge = dbSequalize.define('reputationBadge', {
        fields: ['reputationBadge']
    }]
 });
-// export 
+ 
 const hotel_location = dbSequalize.define('hotel_location', {
     location_id: {
         type: Sequelize.INTEGER,
@@ -84,7 +84,7 @@ const hotel_location = dbSequalize.define('hotel_location', {
        fields: ['city', 'country']
    }]
 });
-// export
+
 const items = dbSequalize.define('items', {
     id: {
         type: Sequelize.INTEGER,
@@ -155,7 +155,7 @@ const items = dbSequalize.define('items', {
    }]
 });
 
-// export
+
 const image = dbSequalize.define('image', {
     image: {
         type: Sequelize.INTEGER,
@@ -200,8 +200,6 @@ hotelier.hasMany(items, {
 items.belongsTo(hotelier, {
 foreignKey: "hotelier_id"
 });
-
-// dbSequalize.sync();
 
 module.exports = {
     hotelier,
