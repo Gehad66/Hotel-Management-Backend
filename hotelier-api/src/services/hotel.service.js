@@ -1,6 +1,6 @@
 var hotel = require("../models/hotels.model");
 var validator = require("./validation");
-var helperFunctions = require("../controllers/helper");
+var helperFunctions = require("./helper");
 const apiError = require("../Errors/apiError");
 
 exports.getAllHoteliers = async function (req, res) {
